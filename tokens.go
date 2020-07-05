@@ -9,7 +9,7 @@ import (
 
 // Service interface
 type Service interface {
-	GenerateTokens(userID, count int) (*GenerateTokensResponse, error)
+	GenerateTokens(userID int, email string, count int) (*GenerateTokensResponse, error)
 }
 
 type service struct {
@@ -22,7 +22,7 @@ func New(address string, logger *logrus.Logger) Service {
 	return &service{address, logger}
 }
 
-func (s *service) GenerateTokens(userID, count int) (*GenerateTokensResponse, error) {
+func (s *service) GenerateTokens(userID int, email string, count int) (*GenerateTokensResponse, error) {
 	client, err := rpc.DialHTTP("tcp", s.address)
 	if err != nil {
 		return &GenerateTokensResponse{}, err
@@ -31,13 +31,14 @@ func (s *service) GenerateTokens(userID, count int) (*GenerateTokensResponse, er
 	var response GenerateTokensResponse
 	request := GenerateTokensRequest{
 		UserID: userID,
+		Email:  email,
 		Count:  count,
 	}
 
-	err = client.Call("RPC.CheckUserAuth", request, &response)
+	err = client.Call("RPC.GenerateTokens", request, &response)
 	s.logger.Infof("RPC response %v", response)
 	if response.Success == false {
-		return &GenerateTokensResponse{}, errors.New("Could not generate tokens on in the account service")
+		return &GenerateTokensResponse{}, errors.New("Could not generate tokens in the tokens service")
 	}
 	if err != nil {
 		return &GenerateTokensResponse{}, err
