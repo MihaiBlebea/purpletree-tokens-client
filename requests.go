@@ -2,9 +2,10 @@ package tc
 
 // GenerateTokensRequest request contract
 type GenerateTokensRequest struct {
-	UserID int
-	Email  string
-	Count  int
+	UserID    int
+	ProductID int
+	Email     string
+	Count     int
 }
 
 // GenerateTokensResponse response contract
